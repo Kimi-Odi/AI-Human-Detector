@@ -63,12 +63,14 @@ class DesklibAIDetectionModel(PreTrainedModel):
 @st.cache_resource
 def load_detector():
     config = AutoConfig.from_pretrained(DET_MODEL_NAME)
-    tokenizer = AutoTokenizer.from_pretrained(DET_MODEL_NAME)
+    # 關鍵：關掉 fast tokenizer，改用純 Python 版
+    tokenizer = AutoTokenizer.from_pretrained(DET_MODEL_NAME, use_fast=False)
     model = DesklibAIDetectionModel.from_pretrained(DET_MODEL_NAME, config=config)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
     return tokenizer, model, device
+
 
 
 def detector_predict_prob_batch(
